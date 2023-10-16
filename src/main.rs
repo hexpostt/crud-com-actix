@@ -13,7 +13,6 @@ mod services;
 #[derive(Clone)]
 pub struct AppState {
     postgres_client: Pool<Postgres>,
-    json_web_token: String,
 }
 
 #[get("/")]
@@ -28,7 +27,6 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     let pg_client = postgres_connection::start_connection().await;
-    let json_web_token_environment = std::env::var("JSON_WEB_TOKEN_SECRET").expect("Variavel do jwt não inserida");
 
     HttpServer::new(move || {
             let cors = Cors::default()
@@ -41,7 +39,6 @@ async fn main() -> std::io::Result<()> {
                 .app_data(
                     web::Data::new(AppState {
                         postgres_client: pg_client.clone(),
-                        json_web_token: json_web_token_environment.clone()
                     }),
                 )
                 .service(index)
